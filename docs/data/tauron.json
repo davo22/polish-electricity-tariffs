@@ -4,13 +4,13 @@
   "operator_name": "TAURON",
   "distributor": "TAURON Dystrybucja S.A.",
   "default_seller": "TAURON Sprzedaż sp. z o.o.",
-  "source": "Taryfy dla usług dystrybucji (TAURON Dystrybucja) oraz ceny sprzedawcy zobowiązanego (TAURON Sprzedaż), zatwierdzone przez Prezesa URE. Ceny energii w latach 2023–2025 były objęte ustawową ochroną cenową (mrożenie cen), stąd jednolita stawka energii dzień/noc w tych okresach.",
+  "source": "Taryfy dla usług dystrybucji (TAURON Dystrybucja) oraz ceny energii (TAURON Sprzedaż), zatwierdzone przez Prezesa URE. Ceny energii w latach 2023–2025 były objęte ustawową ochroną cenową (mrożenie): do 30.06.2024 obowiązywała cena z tarczy ok. 0,4140 netto/kWh, a od 01.07.2024 do 31.12.2025 cena maksymalna 0,5050 netto/kWh — stąd jednolita stawka energii dzień/noc w tych okresach. Mrożenie zakończyło się 31.12.2025, więc od 2026 cena energii zależy od oferty sprzedawcy.",
   "source_url": "https://www.tauron-dystrybucja.pl/uslugi-dystrybucyjne/stawki-oplat-dystrybucyjnych",
   "updated": "2026-10-02",
   "currency": "PLN",
   "vat": 0.23,
   "net_metering_factor": 0.8,
-  "notes": "Stawki netto (bez VAT). Cena poboru za kWh = suma składników zmiennych x (1+VAT). Wartość opustu (net-metering) za kWh = net_metering_factor x suma(opust_components) x (1+VAT). Opłaty stałe nie wpływają na koszt za kWh. Ceny energii dotyczą sprzedawcy zobowiązanego — przy ofercie rynkowej należy nadpisać cenę energii. Każda taryfa ma listę okresów (periods) z własnymi stawkami; dla danej daty obowiązuje okres, w którym valid_from <= data <= valid_to (valid_to null = nadal obowiązuje).",
+  "notes": "Stawki netto (bez VAT). Cena poboru za kWh = suma składników zmiennych x (1+VAT). Wartość opustu (net-metering) za kWh = net_metering_factor x suma(opust_components) x (1+VAT). Opłaty stałe nie wpływają na koszt za kWh. Stawki dystrybucyjne (składnik zmienny) są regulowane przez URE i jednolite dla danej grupy taryfowej w całym obszarze TAURON Dystrybucja. Składniki jakościowy, OZE i kogeneracyjny są ogólnosystemowe (takie same dla G11 i G12 w danym okresie). Ceny energii do 2025 to ustawowe ceny maksymalne (mrożenie); od 2026 energia zależy od oferty sprzedawcy — wartości 2026 są przykładowe i należy je nadpisać ceną ze swojej umowy. Każda taryfa ma listę okresów (periods); dla danej daty obowiązuje okres, w którym valid_from <= data <= valid_to (valid_to null = nadal obowiązuje).",
   "tariffs": {
     "G11": {
       "name": "G11 — jednostrefowa (całodobowa)",
@@ -20,13 +20,72 @@
         {
           "valid_from": "2026-01-01",
           "valid_to": null,
-          "confidence": "medium",
-          "energy_net": { "all": 0.5041 },
-          "distribution_variable_net": { "all": 0.1676 },
+          "confidence": "high",
+          "note": "Mrożenie cen energii zakończone 31.12.2025 — cena energii zależy od oferty sprzedawcy (wartość przykładowa, do nadpisania). Stawki dystrybucyjne wg taryfy TAURON Dystrybucja 2026.",
+          "energy_net": { "all": 0.4769 },
+          "distribution_variable_net": { "all": 0.2464 },
           "quality_net": 0.0332,
           "oze_net": 0.0073,
           "cogeneration_net": 0.0030,
-          "fixed_monthly_net": { "network_fixed": { "1ph": 9.08, "3ph": 13.36 }, "subscription": 0.38 }
+          "fixed_monthly_net": {
+            "network_fixed": { "1ph": 7.38 },
+            "subscription": 0.76,
+            "transition": 0.33,
+            "capacity_fee_by_annual_kwh": [
+              { "max_kwh": 500, "net": 4.29 },
+              { "max_kwh": 1200, "net": 10.31 },
+              { "max_kwh": 2800, "net": 17.18 },
+              { "max_kwh": null, "net": 24.05 }
+            ]
+          }
+        },
+        {
+          "valid_from": "2025-01-01",
+          "valid_to": "2025-12-31",
+          "confidence": "high",
+          "note": "Energia pod ochroną cenową (cena maksymalna 0,5050 netto).",
+          "energy_net": { "all": 0.5050 },
+          "distribution_variable_net": { "all": 0.2541 },
+          "quality_net": 0.0321,
+          "oze_net": 0.0035,
+          "cogeneration_net": 0.0030,
+          "fixed_monthly_net": { "network_fixed": { "1ph": 7.02 }, "subscription": 0.76, "transition": 0.33, "capacity_fee": 11.44 }
+        },
+        {
+          "valid_from": "2024-07-01",
+          "valid_to": "2024-12-31",
+          "confidence": "high",
+          "note": "Cena maksymalna energii 0,5050 netto od 01.07.2024. Opłata OZE w 2024 zawieszona (0,00). Stawki dystrybucyjne wg zmiany taryfy zatwierdzonej 28.06.2024.",
+          "energy_net": { "all": 0.5050 },
+          "distribution_variable_net": { "all": 0.2573 },
+          "quality_net": 0.0314,
+          "oze_net": 0.0000,
+          "cogeneration_net": 0.00618,
+          "fixed_monthly_net": { "network_fixed": { "1ph": 7.02 }, "subscription": 0.76, "transition": 0.33 }
+        },
+        {
+          "valid_from": "2024-01-01",
+          "valid_to": "2024-06-30",
+          "confidence": "high",
+          "note": "Cena energii z tarczy (mrożenie) ok. 0,4140 netto do 30.06.2024. Opłata OZE zawieszona (0,00).",
+          "energy_net": { "all": 0.4140 },
+          "distribution_variable_net": { "all": 0.1824 },
+          "quality_net": 0.0095,
+          "oze_net": 0.0000,
+          "cogeneration_net": 0.00618,
+          "fixed_monthly_net": { "network_fixed": { "1ph": 3.82 }, "subscription": 0.76, "transition": 0.33 }
+        },
+        {
+          "valid_from": "2023-01-01",
+          "valid_to": "2023-12-31",
+          "confidence": "high",
+          "note": "Cena energii pod mrożeniem ok. 0,4140 netto. Opłata OZE zawieszona (0,00).",
+          "energy_net": { "all": 0.4140 },
+          "distribution_variable_net": { "all": 0.1824 },
+          "quality_net": 0.0095,
+          "oze_net": 0.0000,
+          "cogeneration_net": 0.00496,
+          "fixed_monthly_net": { "network_fixed": { "1ph": 3.82 }, "subscription": 0.76, "transition": 0.33 }
         }
       ]
     },
@@ -37,11 +96,13 @@
         "night": { "label": "Noc (T2)", "hours": "22:00-06:00, 13:00-15:00" }
       },
       "opust_components": ["energy", "distribution_variable", "quality"],
+      "note": "Dane G12 obejmują okresy od 01.07.2024. Dla wcześniejszych okresów (2023 – I poł. 2024) składniki ogólnosystemowe i cena energii były takie same jak w G11, ale stawki dystrybucyjne G12 (dzień/noc) nie są jeszcze wprowadzone.",
       "periods": [
         {
           "valid_from": "2026-01-01",
           "valid_to": null,
           "confidence": "high",
+          "note": "Mrożenie zakończone 31.12.2025 — cena energii zależy od oferty sprzedawcy (wartości przykładowe, do nadpisania). Stawki dystrybucyjne wg taryfy TAURON Dystrybucja 2026.",
           "energy_net": { "day": 0.5480, "night": 0.4180 },
           "distribution_variable_net": { "day": 0.2841, "night": 0.0558 },
           "quality_net": 0.0332,
@@ -62,7 +123,7 @@
           "valid_from": "2025-01-01",
           "valid_to": "2025-12-31",
           "confidence": "high",
-          "note": "Energia pod ochroną cenową (mrożenie) — stawka jednolita dzień/noc 0,5050 netto.",
+          "note": "Energia pod ochroną cenową (cena maksymalna 0,5050 netto) — stawka jednolita dzień/noc.",
           "energy_net": { "day": 0.5050, "night": 0.5050 },
           "distribution_variable_net": { "day": 0.2899, "night": 0.0609 },
           "quality_net": 0.0321,
@@ -71,10 +132,10 @@
           "fixed_monthly_net": { "network_fixed": { "1ph": 9.08, "3ph": 10.34 }, "subscription": 0.38 }
         },
         {
-          "valid_from": "2024-01-01",
+          "valid_from": "2024-07-01",
           "valid_to": "2024-12-31",
-          "confidence": "medium",
-          "note": "Stawki dystrybucyjne z taryfy rocznej 2024. Energia pod ochroną cenową — wartość 0,5050 netto dotyczy II połowy 2024; w I połowie 2024 limit bywał niższy. Opłata OZE w 2024 zawieszona.",
+          "confidence": "high",
+          "note": "Cena maksymalna energii 0,5050 netto od 01.07.2024 — jednolita dzień/noc. Opłata OZE zawieszona (0,00). Stawki dystrybucyjne wg zmiany taryfy z 28.06.2024.",
           "energy_net": { "day": 0.5050, "night": 0.5050 },
           "distribution_variable_net": { "day": 0.2934, "night": 0.0618 },
           "quality_net": 0.0314,
