@@ -18,47 +18,53 @@ Served from GitHub Pages:
 - `https://davo22.github.io/polish-electricity-tariffs/data/index.json` — operator list
 - `https://davo22.github.io/polish-electricity-tariffs/data/tauron.json` — TAURON
 
-## Format (schema 3)
+## Format (schema 4)
 
-All rates are **net** (without VAT), in PLN. An operator file carries all its
-**household (G) tariff groups** under `tariffs` (TAURON: G11, G12, G12w, G12as,
-G13, G13s, G14dynamic).
+All rates are **net** (without VAT), in PLN. The key idea: **distribution is
+separate from energy**, because they behave differently.
 
-Each tariff has `zones` and a list of time `periods`; for a given date the
-applicable period is the one where `valid_from <= date <= valid_to` (`null`
-`valid_to` = still in force). A period holds, **per zone**:
+- **`tariffs`** — regulated **distribution** per household (G) group (TAURON:
+  G11, G12, G12w, G12as, G13, G13s, G14dynamic). Each tariff has `zones` and a
+  list of `periods`; a period holds, per zone, `distribution_variable_net` and
+  `fixed_monthly_net.network_fixed` (1ph/3ph; fixed fee, no per-kWh effect).
+- **`energy_products`** — **energy** prices by seller × offer. The consumer picks
+  a group **and** a product (default = `default_energy_product`).
+- **`system_components`** — the system-wide charges, identical for every G group
+  in a period: `quality_net`, `oze_net`, `cogeneration_net`, plus shared fixed
+  fees (`subscription_net`, `transition_fee_*`, `capacity_fee_*`).
 
-| Field | Meaning |
-| --- | --- |
-| `energy_net` | energy (sprzedaż) price per kWh (`null` = no obligated-seller price; set from your contract) |
-| `distribution_variable_net` | variable network charge per kWh |
-| `fixed_monthly_net.network_fixed` | fixed network component (1ph/3ph; does not affect per-kWh cost) |
-
-The **system-wide** components — identical for every G group in a given period —
-live once in a top-level `system_components` list (merge by the same date rule):
-`quality_net`, `oze_net`, `cogeneration_net`, plus shared fixed fees
-(`subscription_net`, `transition_fee_*`, `capacity_fee_*`).
+For a given date, the applicable period in each list is the one where
+`valid_from <= date <= valid_to` (`null` `valid_to` = still in force).
 
 Derived per-kWh prices (gross), per zone:
 
 ```
-consumption_price  = (energy[zone] + distribution_variable[zone] + quality + oze + cogeneration) × (1 + vat)
-net-metering credit = net_metering_factor × Σ(opust_components, per zone) × (1 + vat)
+consumption_price  = (energy + distribution_variable[zone] + quality + oze + cogeneration) × (1 + vat)
+net-metering credit = net_metering_factor × Σ(opust_components) × (1 + vat)
 ```
 
-where `quality`/`oze`/`cogeneration` come from the matching `system_components`
-period. `opust_components` lists which components the net-metering credit is based
-on (OZE and cogeneration are charged on the full draw, so they are excluded;
-`null` means net-metering does not apply, e.g. G14dynamic).
+`quality`/`oze`/`cogeneration` come from the matching `system_components` period.
+`opust_components` lists which components the net-metering credit is based on
+(OZE/cogeneration are on the full draw, so excluded; `null` = net-metering N/A,
+e.g. G14dynamic).
 
-Energy prices for 2026 are the **obligated-seller** (sprzedawca z urzędu,
-TAURON Sprzedaż) rates; on a market offer the energy component differs — override
-it. In 2023–2025 energy was under a statutory price freeze (flat, no zones).
-`G12as`/`G13s`/`G14dynamic` have no obligated-seller energy price (`energy_net`
-null); G14dynamic is a dynamic tariff (energy = hourly market price, RCE).
+**Resolving the energy price** for (product, group, zone, date): take the
+product's period for that date, then:
+
+| `type` | how energy is resolved |
+| --- | --- |
+| `regulated` / `fixed` | `flat_price_net` if present (applies to all groups/zones, e.g. the 2023–2025 freeze), else `prices_net[group][zone]` |
+| `urzad_plus` | `reference` product's resolved price **+ `delta_net`** (models “obligated-seller price + margin”) |
+| `dynamic` | hourly market price (RCE) **+ `margin_net`** — no fixed number |
+
+A missing entry → `null` → set it from your own contract. `G12as`/`G13s` have no
+obligated-seller energy; `G14dynamic` is dynamic (RCE). Market-offer prices are
+**volatile and promotional** — TAURON's own numbers often live only in its
+calculator, so this repo curates the regulated default plus a few examples; add
+or override offers as needed.
 
 Complex zone shapes: `G13`/`G13s` zone **hours** are seasonal (lato/zima);
-`G13s` distribution rates are nested by season + day type
+`G13s` distribution is nested by season + day type
 (`summer_workday`/`summer_holiday`/`winter_workday`/`winter_holiday`);
 `G12as` splits the night charge into `night_within_baseline` /
 `night_above_baseline`; `G14dynamic` uses zones `S1`–`S4` mapped hourly via the
