@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "operator": "tauron",
+  "operator_name": "TAURON",
+  "distributor": "TAURON Dystrybucja S.A.",
+  "default_seller": "TAURON Sprzedaż sp. z o.o.",
+  "source": "Taryfy dla usług dystrybucji (TAURON Dystrybucja) oraz ceny sprzedawcy zobowiązanego (TAURON Sprzedaż), zatwierdzone przez Prezesa URE. Ceny energii w latach 2023–2025 były objęte ustawową ochroną cenową (mrożenie cen), stąd jednolita stawka energii dzień/noc w tych okresach.",
+  "source_url": "https://www.tauron-dystrybucja.pl/uslugi-dystrybucyjne/stawki-oplat-dystrybucyjnych",
+  "updated": "2026-10-02",
+  "currency": "PLN",
+  "vat": 0.23,
+  "net_metering_factor": 0.8,
+  "notes": "Stawki netto (bez VAT). Cena poboru za kWh = suma składników zmiennych x (1+VAT). Wartość opustu (net-metering) za kWh = net_metering_factor x suma(opust_components) x (1+VAT). Opłaty stałe nie wpływają na koszt za kWh. Ceny energii dotyczą sprzedawcy zobowiązanego — przy ofercie rynkowej należy nadpisać cenę energii. Każda taryfa ma listę okresów (periods) z własnymi stawkami; dla danej daty obowiązuje okres, w którym valid_from <= data <= valid_to (valid_to null = nadal obowiązuje).",
+  "tariffs": {
+    "G11": {
+      "name": "G11 — jednostrefowa (całodobowa)",
+      "zones": { "all": { "label": "Całodobowo" } },
+      "opust_components": ["energy", "distribution_variable", "quality"],
+      "periods": [
+        {
+          "valid_from": "2026-01-01",
+          "valid_to": null,
+          "confidence": "medium",
+          "energy_net": { "all": 0.5041 },
+          "distribution_variable_net": { "all": 0.1676 },
+          "quality_net": 0.0332,
+          "oze_net": 0.0073,
+          "cogeneration_net": 0.0030,
+          "fixed_monthly_net": { "network_fixed": { "1ph": 9.08, "3ph": 13.36 }, "subscription": 0.38 }
+        }
+      ]
+    },
+    "G12": {
+      "name": "G12 — dwustrefowa (dzień/noc)",
+      "zones": {
+        "day": { "label": "Dzień (T1)", "hours": "06:00-13:00, 15:00-22:00" },
+        "night": { "label": "Noc (T2)", "hours": "22:00-06:00, 13:00-15:00" }
+      },
+      "opust_components": ["energy", "distribution_variable", "quality"],
+      "periods": [
+        {
+          "valid_from": "2026-01-01",
+          "valid_to": null,
+          "confidence": "high",
+          "energy_net": { "day": 0.5480, "night": 0.4180 },
+          "distribution_variable_net": { "day": 0.2841, "night": 0.0558 },
+          "quality_net": 0.0332,
+          "oze_net": 0.0073,
+          "cogeneration_net": 0.0030,
+          "fixed_monthly_net": {
+            "network_fixed": { "1ph": 9.08, "3ph": 10.86 },
+            "subscription": 0.38,
+            "capacity_fee_by_annual_kwh": [
+              { "max_kwh": 500, "net": 4.29 },
+              { "max_kwh": 1200, "net": 10.31 },
+              { "max_kwh": 2800, "net": 17.18 },
+              { "max_kwh": null, "net": 24.05 }
+            ]
+          }
+        },
+        {
+          "valid_from": "2025-01-01",
+          "valid_to": "2025-12-31",
+          "confidence": "high",
+          "note": "Energia pod ochroną cenową (mrożenie) — stawka jednolita dzień/noc 0,5050 netto.",
+          "energy_net": { "day": 0.5050, "night": 0.5050 },
+          "distribution_variable_net": { "day": 0.2899, "night": 0.0609 },
+          "quality_net": 0.0321,
+          "oze_net": 0.0035,
+          "cogeneration_net": 0.0030,
+          "fixed_monthly_net": { "network_fixed": { "1ph": 9.08, "3ph": 10.34 }, "subscription": 0.38 }
+        },
+        {
+          "valid_from": "2024-01-01",
+          "valid_to": "2024-12-31",
+          "confidence": "medium",
+          "note": "Stawki dystrybucyjne z taryfy rocznej 2024. Energia pod ochroną cenową — wartość 0,5050 netto dotyczy II połowy 2024; w I połowie 2024 limit bywał niższy. Opłata OZE w 2024 zawieszona.",
+          "energy_net": { "day": 0.5050, "night": 0.5050 },
+          "distribution_variable_net": { "day": 0.2934, "night": 0.0618 },
+          "quality_net": 0.0314,
+          "oze_net": 0.0000,
+          "cogeneration_net": 0.00618,
+          "fixed_monthly_net": { "network_fixed": { "1ph": 9.08, "3ph": 10.34 }, "subscription": 0.38 }
+        }
+      ]
+    }
+  }
+}

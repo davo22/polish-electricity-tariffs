@@ -1,0 +1,13 @@
+{
+  "schema": 2,
+  "updated": "2026-10-02",
+  "base_url": "https://davo22.github.io/polish-electricity-tariffs/data/",
+  "operators": [
+    {
+      "id": "tauron",
+      "name": "TAURON",
+      "file": "tauron.json",
+      "tariffs": ["G11", "G12"]
+    }
+  ]
+}

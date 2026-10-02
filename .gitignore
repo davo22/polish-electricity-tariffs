@@ -1,0 +1,7 @@
+.DS_Store
+*.pdf
+*.swp
+__pycache__/
+*.pyc
+.venv/
+node_modules/
