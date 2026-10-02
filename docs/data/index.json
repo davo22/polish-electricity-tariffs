@@ -1,14 +1,14 @@
 {
-  "schema": 2,
+  "schema": 3,
   "updated": "2026-10-02",
   "base_url": "https://davo22.github.io/polish-electricity-tariffs/data/",
-  "notes": "W Polsce stawki dystrybucyjne zależą od operatora (OSD). U TAURON Dystrybucja taryfa dla grup G jest jednolita w całym obszarze (potwierdzone dla 2024 i 2026). U niektórych innych OSD mogą występować obszary z różnymi stawkami — wtedy plik operatora opisze to w polu 'region'. Cena energii (sprzedaż) zależy od sprzedawcy/oferty, nie od obszaru dystrybucji.",
+  "notes": "Baza stawek dla gospodarstw domowych (grupy taryfowe G). Stawki dystrybucyjne zależą od operatora (OSD); u TAURON Dystrybucja taryfa G jest jednolita w całym obszarze. Cena energii zależy od sprzedawcy/oferty, nie od obszaru dystrybucji. Składniki jakościowy/OZE/kogeneracyjny są wspólne dla wszystkich grup G danego operatora (patrz 'system_components' w pliku operatora).",
   "operators": [
     {
       "id": "tauron",
       "name": "TAURON",
       "file": "tauron.json",
-      "tariffs": ["G11", "G12"],
+      "tariffs": ["G11", "G12", "G12w", "G12as", "G13", "G13s", "G14dynamic"],
       "region": "tauron-all",
       "region_name": "Cały obszar TAURON Dystrybucja (taryfa jednolita)"
     }

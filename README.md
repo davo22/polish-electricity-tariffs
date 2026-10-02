@@ -18,36 +18,51 @@ Served from GitHub Pages:
 - `https://davo22.github.io/polish-electricity-tariffs/data/index.json` — operator list
 - `https://davo22.github.io/polish-electricity-tariffs/data/tauron.json` — TAURON
 
-## Format
+## Format (schema 3)
 
-All rates are **net** (without VAT), in PLN. Each tariff carries a list of time
-`periods`; for a given date the applicable period is the one where
-`valid_from <= date <= valid_to` (a `null` `valid_to` means it is still in force).
-Each period lists, per zone:
+All rates are **net** (without VAT), in PLN. An operator file carries all its
+**household (G) tariff groups** under `tariffs` (TAURON: G11, G12, G12w, G12as,
+G13, G13s, G14dynamic).
+
+Each tariff has `zones` and a list of time `periods`; for a given date the
+applicable period is the one where `valid_from <= date <= valid_to` (`null`
+`valid_to` = still in force). A period holds, **per zone**:
 
 | Field | Meaning |
 | --- | --- |
-| `energy_net` | energy (sprzedaż) price per kWh |
+| `energy_net` | energy (sprzedaż) price per kWh (`null` = no obligated-seller price; set from your contract) |
 | `distribution_variable_net` | variable network charge per kWh |
-| `quality_net` | quality charge (stawka jakościowa) per kWh |
-| `oze_net` | RES charge (opłata OZE) per kWh |
-| `cogeneration_net` | cogeneration charge per kWh |
-| `fixed_monthly_net` | monthly fixed fees (do not affect per-kWh cost) |
+| `fixed_monthly_net.network_fixed` | fixed network component (1ph/3ph; does not affect per-kWh cost) |
 
-Derived per-kWh prices (gross):
+The **system-wide** components — identical for every G group in a given period —
+live once in a top-level `system_components` list (merge by the same date rule):
+`quality_net`, `oze_net`, `cogeneration_net`, plus shared fixed fees
+(`subscription_net`, `transition_fee_*`, `capacity_fee_*`).
+
+Derived per-kWh prices (gross), per zone:
 
 ```
-consumption_price  = (energy + distribution_variable + quality + oze + cogeneration) × (1 + vat)
-net-metering credit = net_metering_factor × Σ(opust_components) × (1 + vat)
+consumption_price  = (energy[zone] + distribution_variable[zone] + quality + oze + cogeneration) × (1 + vat)
+net-metering credit = net_metering_factor × Σ(opust_components, per zone) × (1 + vat)
 ```
 
-`opust_components` lists which components the net-metering credit is based on
-(OZE and cogeneration are charged on the full draw, so they are excluded).
+where `quality`/`oze`/`cogeneration` come from the matching `system_components`
+period. `opust_components` lists which components the net-metering credit is based
+on (OZE and cogeneration are charged on the full draw, so they are excluded;
+`null` means net-metering does not apply, e.g. G14dynamic).
 
-Energy prices are the **obligated-seller** (TAURON Sprzedaż) rates. On a market
-offer the energy component differs — a consumer of this data should allow an
-override. In 2023–2025 the energy component was under a statutory price freeze
-(ochrona cenowa), hence a single day/night energy rate in those periods.
+Energy prices for 2026 are the **obligated-seller** (sprzedawca z urzędu,
+TAURON Sprzedaż) rates; on a market offer the energy component differs — override
+it. In 2023–2025 energy was under a statutory price freeze (flat, no zones).
+`G12as`/`G13s`/`G14dynamic` have no obligated-seller energy price (`energy_net`
+null); G14dynamic is a dynamic tariff (energy = hourly market price, RCE).
+
+Complex zone shapes: `G13`/`G13s` zone **hours** are seasonal (lato/zima);
+`G13s` distribution rates are nested by season + day type
+(`summer_workday`/`summer_holiday`/`winter_workday`/`winter_holiday`);
+`G12as` splits the night charge into `night_within_baseline` /
+`night_above_baseline`; `G14dynamic` uses zones `S1`–`S4` mapped hourly via the
+PSE Energetyczny Kompas.
 
 ## Confidence
 
